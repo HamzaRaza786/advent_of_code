@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{i64::MAX, ops::Range};
 
 fn main() {
     let mut partNumber = GridRepresentation::new();
@@ -10,46 +10,51 @@ pub trait Runner {
     fn part1(&mut self);
     fn part2(&mut self);
 }
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct GridRepresentation {
-    nums: Vec<PartNumbers>,
-    syms: HashSet<(i64, i64)>,
-    gearRatios: HashSet<(i64, i64)>,
+    seeds: Vec<i64>,
+    mapping: Vec<Map>,
+    seedRange: Vec<Range<i64>>
 }
 impl GridRepresentation {
     pub fn new() -> Self {
         Self::default()
     }
 }
-
-#[derive(Debug)]
-struct PartNumbers {
-    value: i64,
-    points: HashSet<(i64, i64)>,
+#[derive(Debug, Default)]
+pub struct Seeds {
+    start: i64,
+    length: i64
 }
-impl PartNumbers {
-    fn new(row: i64, col: i64, ch: char) -> Self {
-        let points = HashSet::from([
-            (row - 1, col - 1),
-            (row, col - 1),
-            (row + 1, col - 1),
-            (row - 1, col),
-            (row + 1, col),
-            (row - 1, col + 1),
-            (row, col + 1),
-            (row + 1, col + 1),
-        ]);
-        Self {
-            value: (ch as u8 - b'0') as i64,
-            points,
+#[derive(Debug, Default)]
+pub struct Map {
+    map: Vec<SingleMap>,
+}
+impl Map {
+    fn add_mapping(&mut self, dest: i64, src: i64, len: i64) {
+        self.map.push(SingleMap {
+            range: Range {
+                start: src,
+                end: src + len,
+            },
+            delta: dest - src,
+        });
+    }
+    fn apply_mapping(&self, seed: i64) -> i64 {
+        for sm in &self.map {
+            if sm.range.contains(&seed) {
+                return seed + sm.delta;
+            }
         }
-    }
-    fn add_digit(&mut self, row: i64, col: i64, ch: char) {
-        self.value = self.value * 10 + (ch as u8 - b'0') as i64;
-        self.points
-            .extend([(row - 1, col + 1), (row, col + 1), (row + 1, col + 1)])
+        seed
     }
 }
+#[derive(Debug)]
+pub struct SingleMap {
+    range: Range<i64>,
+    delta: i64,
+}
+
 pub fn read_lines(_pathname: &str) -> Vec<String> {
     include_str!("./input.txt")
         .split('\n')
@@ -60,58 +65,52 @@ pub fn read_lines(_pathname: &str) -> Vec<String> {
 impl Runner for GridRepresentation {
     fn parse(&mut self) {
         let lines = read_lines("./input.txt");
-        let mut curr_number: Option<PartNumbers> = None;
-        for (row, line) in lines.iter().enumerate() {
-            for (col, ch) in line.chars().enumerate() {
-                if ch.is_ascii_digit() {
-                    if let Some(ref mut num) = curr_number {
-                        println!("{:?}", num);
-                        num.add_digit(row as i64, col as i64, ch);
-                    } else {
-                        curr_number = Some(PartNumbers::new(row as i64, col as i64, ch));
-                    }
-                } else {
-                    if let Some(num) = curr_number.take() {
-                        self.nums.push(num);
-                    }
-                    if ch != '.' {
-                        self.syms.insert((row as i64, col as i64));
-                    }
-                    if ch == '*' {
-                        self.gearRatios.insert((row as i64, col as i64));
-                    }
-                }
+        let seeds = lines[0].split_once(": ").unwrap().1;
+        self.seeds = seeds.split(' ').map(|seed| seed.parse().unwrap()).collect();
+        for (i, val) in self.seeds.iter().enumerate().step_by(2){
+           self.seedRange.push(Range{
+               start: *val,
+               end: *val + self.seeds[i+1]
+            }); 
+        } 
+        let mut currmap = Map::default();
+        for line in lines[2..].iter() {
+            if line.contains(':') {
+                self.mapping.push(currmap);
+                currmap = Map::default();
+                continue;
             }
+            let nums: Vec<i64> = line.split(' ').map(|num| num.parse().unwrap()).collect();
+            currmap.add_mapping(nums[0], nums[1], nums[2]);
+        }
+        if !currmap.map.is_empty() {
+            self.mapping.push(currmap);
         }
     }
     fn part1(&mut self) {
-        let mut total = 0;
-        for num in &self.nums {
-            if num.points.intersection(&self.syms).next().is_some() {
-                total += num.value;
+        let mut min = MAX;
+        for seed in self.seeds.iter() {
+            let mut enter_seed = seed.clone();
+            for map in self.mapping.iter() {
+                enter_seed = map.apply_mapping(enter_seed);
             }
+            min = min.min(enter_seed);
         }
-        println!("{}", total);
+        println!("Min is: {}", min);
     }
 
     fn part2(&mut self) {
-        let mut total = 0;
-        'next_gear: for gears in &self.gearRatios {
-            let mut matched = Vec::new();
-            for num in &self.nums {
-                if num.points.contains(gears) {
-                    if matched.len() == 2 {
-                        continue 'next_gear;
-                    }
-                    matched.push(num.value);
-                }
+        let mut min = MAX;
+        for seedStruct in self.seedRange.iter() {
+           for seed in seedStruct.clone().into_iter(){ 
+            let mut enter_seed = seed.clone();
+            for map in self.mapping.iter() {
+                enter_seed = map.apply_mapping(enter_seed);
             }
-            if matched.len() == 2 {
-                total += matched[0] * matched[1];
-            }
+            min = min.min(enter_seed);
         }
-        println!("{}", total);
+        }
+        println!("Min is: {}", min);
     }
+    
 }
-
-
