@@ -48,6 +48,15 @@ impl Map {
         }
         seed
     }
+    fn reverse_lookup(&self, val: i64) -> i64 {
+        for map in &self.map {
+            let rev = val - map.delta;
+            if map.range.contains(&rev){
+                return rev;
+            }
+        }
+        val
+    }
 }
 #[derive(Debug)]
 pub struct SingleMap {
@@ -100,17 +109,31 @@ impl Runner for GridRepresentation {
     }
 
     fn part2(&mut self) {
-        let mut min = MAX;
-        for seedStruct in self.seedRange.iter() {
-           for seed in seedStruct.clone().into_iter(){ 
-            let mut enter_seed = seed.clone();
-            for map in self.mapping.iter() {
-                enter_seed = map.apply_mapping(enter_seed);
+        let mut location  = 1_i64;
+        loop {
+            let mut cur = location;
+            for map in self.mapping.iter().rev(){
+                cur = map.reverse_lookup(cur);
             }
-            min = min.min(enter_seed);
+            for sr in &self.seedRange {
+                if sr.contains(&cur){
+                    println!("{} ", location);
+                    return;
+                }
+            }
+            location +=1;
         }
-        }
-        println!("Min is: {}", min);
+        // for seedStruct in self.seedRange.iter() {
+        //    for seed in seedStruct.clone().into_iter(){ 
+        //     let mut enter_seed = seed.clone();
+        //     println!("seed {}", enter_seed);
+        //     for map in self.mapping.iter() {
+        //         enter_seed = map.apply_mapping(enter_seed);
+        //     }
+        //     min = min.min(enter_seed);
+        // }
+        // }
+        // println!("Min is: {}", min);
     }
     
 }
