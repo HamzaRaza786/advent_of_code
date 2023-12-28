@@ -3,7 +3,7 @@ use std::{i64::MAX, ops::Range};
 fn main() {
     let mut partNumber = GridRepresentation::new();
     partNumber.parse();
-    // partNumber.part3();
+    partNumber.part1();
 }
 pub trait Runner {
     fn parse(&mut self);
@@ -12,9 +12,8 @@ pub trait Runner {
 }
 #[derive(Default, Debug)]
 pub struct GridRepresentation {
-    seeds: Vec<i64>,
-    mapping: Vec<Map>,
-    seedRange: Vec<Range<i64>>
+    time: Vec<i64>,
+    distance: Vec<i64>,
 }
 impl GridRepresentation {
     pub fn new() -> Self {
@@ -74,28 +73,19 @@ pub fn read_lines(_pathname: &str) -> Vec<String> {
 impl Runner for GridRepresentation {
     fn parse(&mut self) {
         let lines = read_lines("./input.txt");
-        let time: Vec<_> = lines[0].split_once(": ").unwrap().1.split_whitespace().collect();
-        let : Vec<_> = lines[0].split_once(": ").unwrap().1.split_whitespace().collect();
+        self.time = lines[0].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        self.distance = lines[1].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
     }
     fn part1(&mut self) 
     {
+        for (i, val) in self.time.iter().enumerate(){
+            for j in 1..self.time[i]/2{
+                
+            }
+        }
     }
 
     fn part2(&mut self) {
-        let mut location  = 1_i64;
-        loop {
-            let mut cur = location;
-            for map in self.mapping.iter().rev(){
-                cur = map.reverse_lookup(cur);
-            }
-            for sr in &self.seedRange {
-                if sr.contains(&cur){
-                    println!("{} ", location);
-                    return;
-                }
-            }
-            location +=1;
-        }
     }
-    
+    // 
 }
