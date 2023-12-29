@@ -72,19 +72,26 @@ pub fn read_lines(_pathname: &str) -> Vec<String> {
 }
 impl Runner for GridRepresentation {
     fn parse(&mut self) {
-        let lines = read_lines("./input.txt");
+        let lines = read_lines("./input_test.txt");
         self.time = lines[0].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
         self.distance = lines[1].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
     }
     fn part1(&mut self) 
     {
+        let mut sum = 1;
         for (i, val) in self.time.iter().enumerate(){
-            for j in 1..self.time[i]/2{
-                
-            }
+            let mut count = 0;
+            for j in 1..val + 1{
+                if ((val - j) * j) > self.distance[i]{
+                    count+=1
+                }
         }
+            if count > 0 {
+                sum *=count 
+            }
     }
-
+        println!("{}", sum);
+    }
     fn part2(&mut self) {
     }
     // 
