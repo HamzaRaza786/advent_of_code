@@ -1,9 +1,9 @@
-use std::{i64::MAX, ops::Range};
+use std::{i64::{MAX, self}, ops::Range};
 
 fn main() {
     let mut partNumber = GridRepresentation::new();
     partNumber.parse();
-    partNumber.part1();
+    partNumber.part2();
 }
 pub trait Runner {
     fn parse(&mut self);
@@ -50,9 +50,16 @@ impl Runner for GridRepresentation {
         println!("{}", sum);
     }
     fn part2(&mut self) {
-        let combined_time = self.time.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(",");
-        let combined_distance = self.distance.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(",");
-        println!("time {}, distance {}", combined_time, combined_distance);
-    }
+        let combined_time = self.time.iter().map(|m| m.to_string()).collect::<Vec<String>>().join("").parse::<i64>().unwrap();
+        let combined_distance = self.distance.iter().map(|m| m.to_string()).collect::<Vec<String>>().join("").parse::<i64>().unwrap();
+
+        let mut count = 0;
+            for j in 1..combined_time + 1{
+                if ((combined_time - j) * j) > combined_distance{
+                    count+=1
+                }
+        }
+        println!("{}", count);
+        }
     // 
 }
