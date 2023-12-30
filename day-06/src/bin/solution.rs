@@ -20,49 +20,6 @@ impl GridRepresentation {
         Self::default()
     }
 }
-#[derive(Debug, Default)]
-pub struct Seeds {
-    start: i64,
-    length: i64
-}
-#[derive(Debug, Default)]
-pub struct Map {
-    map: Vec<SingleMap>,
-}
-impl Map {
-    fn add_mapping(&mut self, dest: i64, src: i64, len: i64) {
-        self.map.push(SingleMap {
-            range: Range {
-                start: src,
-                end: src + len,
-            },
-            delta: dest - src,
-        });
-    }
-    fn apply_mapping(&self, seed: i64) -> i64 {
-        for sm in &self.map {
-            if sm.range.contains(&seed) {
-                return seed + sm.delta;
-            }
-        }
-        seed
-    }
-    fn reverse_lookup(&self, val: i64) -> i64 {
-        for map in &self.map {
-            let rev = val - map.delta;
-            if map.range.contains(&rev){
-                return rev;
-            }
-        }
-        val
-    }
-}
-#[derive(Debug)]
-pub struct SingleMap {
-    range: Range<i64>,
-    delta: i64,
-}
-
 pub fn read_lines(_pathname: &str) -> Vec<String> {
     include_str!("./input.txt")
         .split('\n')
@@ -93,6 +50,9 @@ impl Runner for GridRepresentation {
         println!("{}", sum);
     }
     fn part2(&mut self) {
+        let combined_time = self.time.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(",");
+        let combined_distance = self.distance.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(",");
+        println!("time {}, distance {}", combined_time, combined_distance);
     }
     // 
 }
