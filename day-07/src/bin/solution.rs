@@ -3,7 +3,7 @@ use std::{i64::{MAX, self}, ops::Range};
 fn main() {
     let mut partNumber = GridRepresentation::new();
     partNumber.parse();
-    partNumber.part2();
+    partNumber.part1();
 }
 pub trait Runner {
     fn parse(&mut self);
@@ -12,13 +12,18 @@ pub trait Runner {
 }
 #[derive(Default, Debug)]
 pub struct GridRepresentation {
-    time: Vec<i64>,
-    distance: Vec<i64>,
+    hands: Vec<SingleHand>,
 }
 impl GridRepresentation {
     pub fn new() -> Self {
         Self::default()
     }
+}
+#[derive(Default, Debug)]
+pub struct SingleHand {
+    card: Vec<char>,
+    bid: i64,
+    pair_count: i64
 }
 pub fn read_lines(_pathname: &str) -> Vec<String> {
     include_str!("./input.txt")
@@ -30,36 +35,17 @@ pub fn read_lines(_pathname: &str) -> Vec<String> {
 impl Runner for GridRepresentation {
     fn parse(&mut self) {
         let lines = read_lines("./input_test.txt");
-        self.time = lines[0].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
-        self.distance = lines[1].split_once(": ").unwrap().1.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        for line in lines {
+            let line_split = line.split_whitespace().collect::<Vec<_>>();
+            let cards = line_split[0].chars().collect::<Vec<_>>();
+            self.hands.push(SingleHand { card: cards, bid: line_split[1].parse().unwrap(), pair_count: 0})
+        }
+        println!("{:?}", self.hands);
     }
     fn part1(&mut self) 
     {
-        let mut sum = 1;
-        for (i, val) in self.time.iter().enumerate(){
-            let mut count = 0;
-            for j in 1..val + 1{
-                if ((val - j) * j) > self.distance[i]{
-                    count+=1
-                }
-        }
-            if count > 0 {
-                sum *=count 
-            }
-    }
-        println!("{}", sum);
     }
     fn part2(&mut self) {
-        let combined_time = self.time.iter().map(|m| m.to_string()).collect::<Vec<String>>().join("").parse::<i64>().unwrap();
-        let combined_distance = self.distance.iter().map(|m| m.to_string()).collect::<Vec<String>>().join("").parse::<i64>().unwrap();
-
-        let mut count = 0;
-            for j in 1..combined_time + 1{
-                if ((combined_time - j) * j) > combined_distance{
-                    count+=1
-                }
-        }
-        println!("{}", count);
         }
     // 
 }
