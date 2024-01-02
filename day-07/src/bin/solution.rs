@@ -40,10 +40,11 @@ impl Runner for GridRepresentation {
             let cards = line_split[0].chars().collect::<Vec<_>>();
             self.hands.push(SingleHand { card: cards, bid: line_split[1].parse().unwrap(), pair_count: 0})
         }
-        println!("{:?}", self.hands);
+        
     }
     fn part1(&mut self) 
     {
+        println!("{:?}", self.hands);
     }
     fn part2(&mut self) {
         }
