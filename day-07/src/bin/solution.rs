@@ -1,4 +1,7 @@
-use std::{i64::{MAX, self}, ops::Range};
+use std::{
+    i64::{self, MAX},
+    ops::Range,
+};
 
 fn main() {
     let mut partNumber = GridRepresentation::new();
@@ -23,7 +26,7 @@ impl GridRepresentation {
 pub struct SingleHand {
     card: Vec<char>,
     bid: i64,
-    pair_count: i64
+    score: i64,
 }
 pub fn read_lines(_pathname: &str) -> Vec<String> {
     include_str!("./input.txt")
@@ -38,15 +41,22 @@ impl Runner for GridRepresentation {
         for line in lines {
             let line_split = line.split_whitespace().collect::<Vec<_>>();
             let cards = line_split[0].chars().collect::<Vec<_>>();
-            self.hands.push(SingleHand { card: cards, bid: line_split[1].parse().unwrap(), pair_count: 0})
+            let pair_count = 0;
+
+            self.hands.push(SingleHand {
+                card: cards,
+                bid: line_split[1].parse().unwrap(),
+                score: 0,
+            })
         }
-        
-    }
-    fn part1(&mut self) 
-    {
-        println!("{:?}", self.hands);
-    }
-    fn part2(&mut self) {
+        for card in &self.hands {
+            for letter in card.card {
+                
+            }
+            println!("{:?}", card.card);
         }
-    // 
+    }
+    fn part1(&mut self) {}
+    fn part2(&mut self) {}
+    //
 }
