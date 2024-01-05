@@ -51,7 +51,6 @@ impl Runner for GridRepresentation {
         }
         for card in &self.hands {
             for letter in card.card {
-                
             }
             println!("{:?}", card.card);
         }
