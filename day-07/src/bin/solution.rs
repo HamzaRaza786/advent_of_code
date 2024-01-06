@@ -32,7 +32,7 @@ pub struct SingleHand {
 }
 
 pub fn read_lines(_pathname: &str) -> Vec<String> {
-    include_str!("./input.txt")
+    include_str!("./input_test.txt")
         .split('\n')
         .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
@@ -55,7 +55,6 @@ impl Runner for GridRepresentation {
             ('4', 4),
             ('3', 3),
             ('2', 2),
-            ('1', 1),
         ]);
 
         for line in lines {
@@ -77,31 +76,82 @@ impl Runner for GridRepresentation {
                 .collect::<HashSet<&char>>()
                 .into_iter()
                 .collect::<Vec<&char>>();
+            let length = uniq_card.len();
             let mut score = 0;
             for letter in uniq_card {
-                let count = card.card.iter().filter(|&ch| ch == letter).count();
-                if count > 1 && count > score {
+                let mut count = card.card.iter().filter(|&ch| ch == letter).count();
+                if count == 0 {
+                    count = 1;
+                }
+                if count >= 3 && count > score {
+                    if count == 3 && length != 2usize {
+                        score = count;
+                    } else {
+                        score = count + 1;
+                    }
+                } else if count > 1 {
                     score = count;
                 }
             }
-            let mut temp_score = 0;
+            let mut temp_score = score;
             let base: usize = 10usize; // an explicit type is required
             for (i, val) in card.card.iter().enumerate() {
-                temp_score += dict_mapping.get(val).unwrap() * base.pow(5 - i as u32);
+                temp_score += temp_score << 4 | dict_mapping.get(val).unwrap() 
+                // println!("Temp score: {}, {}, {}", i, temp_score, val);
             }
-            card.score = temp_score << score;
+            card.score = temp_score; 
         }
-        self.hands.sort_by(|a,b| a.score.cmp(&b.score));
+        self.hands.sort_by(|a, b| a.score.cmp(&b.score));
     }
     fn part1(&mut self) {
-       let mut rank = 0;
-        for (i,hand) in self.hands.iter().enumerate() {
+        let mut rank = 0;
+        for (i, hand) in &mut self.hands.iter().enumerate() {
+
+            println!("Hand : {:?}, {}", hand.card.iter().map(|ch| from_char(*ch)).collect::<Vec<_>>(), hand.score);
             
-            rank+= hand.bid * (i as i64 + 1);
+            rank += hand.bid * (i as i64 + 1);
         }
+        
         println!("Rank {}", rank);
     }
 
     fn part2(&mut self) {}
     //
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
+enum Card {
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
+    Ace, // 0xd
+}
+
+fn from_char(ch: char) -> Card {
+    match ch {
+        '2' => Card::Two, // 0x0
+        '3' => Card::Three,
+        '4' => Card::Four,
+        '5' => Card::Five,
+        '6' => Card::Six,
+        '7' => Card::Seven,
+        '8' => Card::Eight,
+        '9' => Card::Nine,
+        'T' => Card::Ten,
+        'J' => Card::Jack,
+        'Q' => Card::Queen,
+        'K' => Card::King,
+        'A' => Card::Ace,
+        _ => panic!("code bug"),
+    }
+}
+
