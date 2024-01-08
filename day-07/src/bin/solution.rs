@@ -115,7 +115,10 @@ impl Runner for GridRepresentation {
         println!("Rank {}", rank);
     }
 
-    fn part2(&mut self) {}
+    fn part2(&mut self) {
+        //Starting part2
+    }
+
     //
 }
 
