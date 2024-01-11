@@ -116,7 +116,7 @@ impl Runner for GridRepresentation {
     }
 
     fn part2(&mut self) {
-        //Starting part2
+
     }
 
     //
